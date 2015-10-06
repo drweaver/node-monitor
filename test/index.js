@@ -1,78 +1,100 @@
 
+var nock = require('nock');
+var assert = require('assert');
+
+nock('http://www.rflab.co.za')
+  .get('/')
+//   .socketDelay(2000) // 2 seconds 
+  .reply(301, '<html></html>');
+
+nock('http://www.rflabb.co.za')
+  .get('/')
+//   .socketDelay(2000) // 2 seconds 
+  .reply(404);
+  
+nock('http://www.ragingflame.co.za')
+  .get('/')
+  .socketDelay(25000) // 2 seconds 
+  .reply(200, '<html></html>');
+  
+nock('http://www.slowragingflame.co.za')
+  .get('/')
+  .socketDelay(35000) // 2 seconds 
+  .reply(200, '<html></html>');
+
 var Monitor = require('../lib/monitor');
 
+var monitorEvent = function(monitor, callback) {
+    var event;
+        
+    monitor.on('up', function (res) {
+        event = 'up';
+        monitor.stop();
+    });
+    
+    monitor.on('down', function (res) {
+        event = 'down';
+        monitor.stop();
+    });
+    
+    monitor.on('error', function (res) {
+        event = 'error';
+        monitor.stop();
+    });
+    
+    monitor.on('stop', function (website) {
+        callback(event);
+    });
+};
 
-// website has a redirect, should emit down and show status message
-var ping = new Monitor({website: 'http://www.rflab.co.za', interval: 0.2});
+describe( 'Monitor()', function() {
+    
+    it('should issue down event when 301 is given', function(done) {
+    
+        // website has a redirect, should emit down and show status message
+        var ping = new Monitor({website: 'http://www.rflab.co.za', interval: 0.2});
+        
+        monitorEvent(ping, function callback(event) {
+            assert.equal(event, 'down');
+            done();
+        });
 
-ping.on('up', function (res) {
-    console.log(res.website + " is up \n");
-    ping.stop();
-});
+    });
+    
+    it('should issue down event when 404 is given', function(done) {
+    
+        // website does not exist, should emit down and show status message
+        var ping = new Monitor({website: 'http://www.rflabb.co.za', interval: 0.2});
+        
+        monitorEvent(ping, function callback(event) {
+            assert.equal(event, 'down');
+            done();
+        });
 
-ping.on('down', function (res) {
-    console.log(res.statusMessage + "\n");
-    ping.stop();
-});
+    });
+    
+    it('should issue up event when 200 is given and within timeout', function(done) {
+    
+        // website does not exist, should emit down and show status message
+        var ping = new Monitor({website: 'http://www.ragingflame.co.za', interval: 0.2, socket_timeout: 30});
+        
+        monitorEvent(ping, function callback(event) {
+            assert.equal(event, 'up');
+            done();
+        });
 
-ping.on('error', function (res) {
-    console.log('Oh Shit!! An unexpected error occured trying to load ' + res.website + "! \n");
-    ping2.stop();
-});
+    });
+    
+    it('should issue error event when above timeout', function(done) {
+    
+        // website does not exist, should emit down and show status message
+        var ping = new Monitor({website: 'http://www.ragingflame.co.za', interval: 0.2, socket_timeout: 30});
+        
+        monitorEvent(ping, function callback(event) {
+            assert.equal(event, 'error');
+            done();
+        });
 
-ping.on('stop', function (website) {
-    console.log(website + " monitor has stopped. \n");
-});
-
-
-
-
-
-// website does now exist, monitor should emit down
-var ping2 = new Monitor({website: 'http://www.rflabb.co.za', interval: 0.2});
-
-ping2.on('up', function (res) {
-    console.log(res.website + " is up \n");
-    ping2.stop();
-});
-
-ping2.on('down', function (res) {
-    console.log(res.statusMessage + "\n");
-    ping2.stop();
-});
-
-ping2.on('error', function (res) {
-    console.log('Oh Shit!! An unexpected error occured trying to load ' + res.website + "! \n");
-    ping2.stop();
-});
-
-ping2.on('stop', function (website) {
-    console.log(website + " monitor has stopped. \n");
-});
-
-
-
-
-
-// monitor should emit up
-var ping3 = new Monitor({website: 'http://www.ragingflame.co.za', interval: 0.2});
-
-ping3.on('up', function (res) {
-    console.log(res.website + " is up \n");
-    ping3.stop();
-});
-
-ping3.on('down', function (res) {
-    console.log(res.statusMessage + "\n");
-    ping3.stop();
-});
-
-ping3.on('error', function (res) {
-    console.log('Oh Snap!! An unexpected error occured trying to load ' + res.website + "! \n");
-    ping3.stop();
-});
-
-ping3.on('stop', function (website) {
-    console.log(website + " monitor has stopped. \n");
+    });
 });
 

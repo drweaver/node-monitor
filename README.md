@@ -24,6 +24,7 @@ myWebsite.on(event, callback(response) {
 
 - `website` (* required) - The url of the website to be monitored.
 - `interval` (defaults to 15) - time interval(in minutes) for checking website availability.
+- `socket_timeout` (default to 30) - timeout (in seconds) for website to respond, throws 'error' if above this.
 
 
 
@@ -31,7 +32,7 @@ myWebsite.on(event, callback(response) {
 
 - `up` - All is good website is up.
 - `down` - Not good, website is down.
-- `error` - Bad, http request module cannot load website.
+- `error` - Bad, http request module cannot load website or socket_timeout reached.
 - `stop` - Fired when the monitor has stopped.
 
 
@@ -52,7 +53,8 @@ var Monitor = require('ping-monitor');
 
 var myWebsite = new Monitor({
     website: 'http://www.ragingflame.co.za',
-    interval: 10
+    interval: 10,
+    socket_timeout: 30
 });
 
 
@@ -85,6 +87,8 @@ myWebsite.on('stop', function (website) {
 
 
 ## Testing
+Install [Mocha](http://mochajs.org/) (`npm install -g mocha`) then:
+
 ```
 node test
 ```
