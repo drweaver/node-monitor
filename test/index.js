@@ -4,22 +4,20 @@ var assert = require('assert');
 
 nock('http://www.rflab.co.za')
   .get('/')
-//   .socketDelay(2000) // 2 seconds 
   .reply(301, '<html></html>');
 
 nock('http://www.rflabb.co.za')
   .get('/')
-//   .socketDelay(2000) // 2 seconds 
   .reply(404);
   
 nock('http://www.ragingflame.co.za')
   .get('/')
-  .socketDelay(25000) // 2 seconds 
+  .socketDelay(25000) // 25 seconds 
   .reply(200, '<html></html>');
   
 nock('http://www.slowragingflame.co.za')
   .get('/')
-  .socketDelay(35000) // 2 seconds 
+  .socketDelay(35000) // 35 seconds (above timeout!)
   .reply(200, '<html></html>');
 
 var Monitor = require('../lib/monitor');
@@ -88,10 +86,10 @@ describe( 'Monitor()', function() {
     it('should issue error event when above timeout', function(done) {
     
         // website does not exist, should emit down and show status message
-        var ping = new Monitor({website: 'http://www.ragingflame.co.za', interval: 0.2, socket_timeout: 30});
+        var ping = new Monitor({website: 'http://www.slowragingflame.co.za', interval: 0.2, socket_timeout: 30});
         
         monitorEvent(ping, function callback(event) {
-            assert.equal(event, 'error');
+            assert.equal(event, 'down');
             done();
         });
 

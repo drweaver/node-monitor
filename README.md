@@ -31,8 +31,8 @@ myWebsite.on(event, callback(response) {
 ## Emitted Events
 
 - `up` - All is good website is up.
-- `down` - Not good, website is down.
-- `error` - Bad, http request module cannot load website or socket_timeout reached.
+- `down` - Not good, website is down or socket_timeout reached.
+- `error` - Bad, http request module cannot load website.
 - `stop` - Fired when the monitor has stopped.
 
 
