@@ -12,7 +12,8 @@
     "url": "https://github.com/qawemlilo/node-monitor.git"
   },
   "devDependencies": {
-    "nock": "~2.13.0"
+    "nock": "~2.13.0",
+    "async": "~1.4.2"
   },
   "keywords": [
     "monitor",

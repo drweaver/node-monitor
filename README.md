@@ -87,7 +87,7 @@ myWebsite.on('stop', function (website) {
 
 
 ## Testing
-Install [Mocha](http://mochajs.org/) (`npm install -g mocha`) then:
+Install [Mocha](http://mochajs.org/) (`npm install -g mocha`), install the dependencies (`npm install`) then:
 
 ```
 node test
