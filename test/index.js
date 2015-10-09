@@ -83,11 +83,11 @@ describe('Monitor()', function() {
 
     it('should issue down event when socket times out', function(done) {
 
-        var url = 'http://www.slowragingflame.co.za';
+        var url = 'http://www.slowsocketragingflame.co.za';
 
         nock(url)
             .get('/')
-            .socketDelay(35000) // 35 seconds (above timeout!)
+            .socketDelay(15000) // 15 seconds (above socket timeout!)
             .reply(200, '<html></html>');
 
 
@@ -95,7 +95,32 @@ describe('Monitor()', function() {
         var ping = new Monitor({
             website: url,
             interval: 0.2,
-            socket_timeout: 30
+            socket_timeout: 10
+        });
+
+        monitorEvent(ping, function callback(event) {
+            assert.equal(event, 'down');
+            done();
+        });
+
+    });
+    
+    it('should issue down event when the response times out', function(done) {
+
+        var url = 'http://www.slowresponseragingflame.co.za';
+
+        nock(url)
+            .get('/')
+            .delay(5000) // 5 seconds (above response timeout of 1/2s!)
+            .reply(200, '<html></html>');
+
+
+        // website does not exist, should emit down and show status message
+        var ping = new Monitor({
+            website: url,
+            interval: 0.2,
+            socket_timeout: 10,
+            response_timeout: 0.1
         });
 
         monitorEvent(ping, function callback(event) {

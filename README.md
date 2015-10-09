@@ -24,14 +24,15 @@ myWebsite.on(event, callback(response) {
 
 - `website` (* required) - The url of the website to be monitored.
 - `interval` (defaults to 15) - time interval(in minutes) for checking website availability.
-- `socket_timeout` (default to 30) - timeout (in seconds) for website to respond, throws 'error' if above this.
+- `socket_timeout` (default to 10) - timeout (in seconds) for socket creation, otherwise gives 'down' event.
+- `response_timeout` (default to 30) - timeout (in seconds) for full response, otherwise gives 'down' event.
 
 
 
 ## Emitted Events
 
 - `up` - All is good website is up.
-- `down` - Not good, website is down or socket_timeout reached.
+- `down` - Not good, website is down or socket/response timeout reached.
 - `error` - Bad, http request module cannot load website.
 - `stop` - Fired when the monitor has stopped.
 
@@ -54,7 +55,8 @@ var Monitor = require('ping-monitor');
 var myWebsite = new Monitor({
     website: 'http://www.ragingflame.co.za',
     interval: 10,
-    socket_timeout: 30
+    socket_timeout: 10,
+    response_timeout: 30
 });
 
 
